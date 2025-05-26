@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: auth-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+          jwk-set-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+
+server:
+  port: ${PORT:8081}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL}/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL}
+  realm: ${KEYCLOAK_REALM}
+  resource: ${KEYCLOAK_RESOURCE}
+  credentials:
+    secret: ${KEYCLOAK_SECRET}
+  public-client: false
+  bearer-only: true
+  admin:
+    url: ${KEYCLOAK_ADMIN_URL}
+    realm: ${KEYCLOAK_ADMIN_REALM}
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+    username: ${KEYCLOAK_ADMIN_USERNAME}
+    password: ${KEYCLOAK_ADMIN_PASSWORD}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+logging:
+  level:
+    br.com.leonardosr.auth: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Configurações do OpenAPI
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false 

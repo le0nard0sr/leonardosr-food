@@ -1,0 +1,28 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/leonardosr
+
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: leonardosr
+  resource: auth-service
+  credentials:
+    secret: yZlm7cOQgNm7n6McwOQ4HfsVZycvR4yw
+  public-client: false
+  bearer-only: false
+  ssl-required: external
+  admin:
+    username: admin
+    password: admin
+    realm: master
+    client-id: admin-cli
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    enabled: false 

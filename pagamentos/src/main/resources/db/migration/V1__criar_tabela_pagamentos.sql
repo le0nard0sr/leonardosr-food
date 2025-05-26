@@ -1,0 +1,6 @@
+CREATE TABLE pagamentos (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    status VARCHAR(50) NOT NULL,
+    pedido_id BIGINT NOT NULL,
+    valor DECIMAL(19,2) NOT NULL
+);

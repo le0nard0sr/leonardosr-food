@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: xB@7R1jZ
+      MYSQL_DATABASE: leonardosr
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - leonardosr-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://mysql:3306/keycloak
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: xB@7R1jZ
+    command:
+      - start-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - keycloak_themes:/opt/keycloak/themes
+    depends_on:
+      - mysql
+    networks:
+      - leonardosr-network
+
+  discovery:
+    build: ./discovery
+    container_name: discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - leonardosr-network
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+    depends_on:
+      - discovery
+    networks:
+      - leonardosr-network
+
+  auth:
+    build: ./auth
+    container_name: auth
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/leonardosr?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=xB@7R1jZ
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+      - JWT_SECRET=minha_chave_secreta_super_segura_2024
+      - JWT_EXPIRATION=86400000
+    depends_on:
+      - mysql
+      - keycloak
+      - discovery
+    networks:
+      - leonardosr-network
+
+  pagamentos:
+    build: ./pagamentos
+    container_name: pagamentos
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/leonardosr?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=xB@7R1jZ
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+    depends_on:
+      - mysql
+      - discovery
+    networks:
+      - leonardosr-network
+
+  pedidos:
+    build: ./pedidos
+    container_name: pedidos
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/leonardosr?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=xB@7R1jZ
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+    depends_on:
+      - mysql
+      - discovery
+    networks:
+      - leonardosr-network
+
+volumes:
+  mysql_data:
+  keycloak_data:
+  keycloak_themes:
+
+networks:
+  leonardosr-network:
+    driver: bridge 

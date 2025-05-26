@@ -1,0 +1,46 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/leonardosr
+
+cors:
+  allowed-origins: http://localhost:3000
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: leonardosr
+  resource: auth-service
+  credentials:
+    secret: yZlm7cOQgNm7n6McwOQ4HfsVZycvR4yw
+  public-client: false
+  bearer-only: false
+  ssl-required: external
+  admin:
+    url: http://localhost:8080
+    realm: leonardosr
+    client-id: admin-cli
+    username: admin
+    password: admin
+  public:
+    url: http://localhost:8080
+    realm: leonardosr
+    client-id: auth-service
+    client-secret: yZlm7cOQgNm7n6McwOQ4HfsVZycvR4yw
+
+eureka:
+  client:
+    enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false 

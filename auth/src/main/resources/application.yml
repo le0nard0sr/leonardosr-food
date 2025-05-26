@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: auth-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/leonardosr
+
+keycloak:
+  auth-server-url: http://keycloak:8080
+  realm: leonardosr
+  resource: auth-service
+  credentials:
+    secret: yZlm7cOQgNm7n6McwOQ4HfsVZycvR4yw
+  public-client: false
+  bearer-only: false
+  ssl-required: external
+  admin:
+    username: admin
+    password: admin
+    realm: master
+    client-id: admin-cli
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    hostname: auth-service
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${server.port} 

@@ -85,8 +85,7 @@ Authorization: Bearer {seu-token}
 POST http://localhost:8082/pagamentos-ms/pagamentos
 {
     "valor": 100.00,
-    "pedidoId": 1,
-    "status": "PENDENTE"
+    "pedidoId": 1
 }
 ```
 

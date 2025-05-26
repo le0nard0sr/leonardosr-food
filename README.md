@@ -1,112 +1,130 @@
-# Microsserviços com Spring Boot e Keycloak
+# LeonardoSR Food - Sistema de Microserviços
 
-Este projeto é uma implementação de microsserviços usando Spring Boot, com autenticação e autorização gerenciadas pelo Keycloak.
+Sistema de microserviços para delivery de comida, construído com Spring Boot e arquitetura moderna de microserviços.
 
-## Pré-requisitos
+## 🏗️ Arquitetura
 
+O projeto é composto pelos seguintes microserviços:
+
+- **Gateway (Porto 8082)**: API Gateway central que roteia todas as requisições
+- **Auth Service**: Serviço de autenticação integrado com Keycloak
+- **Pedidos**: Gerenciamento de pedidos
+- **Pagamentos**: Processamento e gestão de pagamentos
+- **Discovery**: Service discovery com Eureka (registro dinâmico de serviços)
+
+## 🚀 Tecnologias
+
+- Java 17
+- Spring Boot
+- Spring Cloud
+- Spring Security
+- Keycloak
 - Docker
-- Docker Compose
-- JDK 21
+- PostgreSQL
+- Eureka Server
 - Maven
 
-## Estrutura do Projeto
+## 📋 Pré-requisitos
 
-O projeto é composto pelos seguintes serviços:
+- Java 17+
+- Docker e Docker Compose
+- Maven
+- PostgreSQL (ou Docker)
+- Keycloak (ou Docker)
 
-- **Discovery Service (Eureka)**: Registro e descoberta de serviços
-- **Gateway Service**: API Gateway usando Spring Cloud Gateway
-- **Auth Service**: Serviço de autenticação integrado com Keycloak
-- **Pagamentos Service**: Gerenciamento de pagamentos
-- **Pedidos Service**: Gerenciamento de pedidos
-- **Keycloak**: Servidor de autenticação e autorização
-- **MySQL**: Banco de dados
-
-## Como Executar
+## 🛠️ Configuração e Instalação
 
 1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/leonardosr.git
-   cd leonardosr
-   ```
+```bash
+git clone https://github.com/le0nard0sr/leonardosr-food.git
+cd leonardosr-food
+```
 
 2. Inicie os serviços com Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
-
-3. Aguarde todos os serviços iniciarem (isso pode levar alguns minutos)
-
-4. Execute o script de configuração do Keycloak:
-   ```bash
-   chmod +x keycloak-config.sh
-   ./keycloak-config.sh
-   ```
-
-## Endpoints
-
-### Keycloak
-- **URL**: http://localhost:8080
-- **Admin Console**: http://localhost:8080/admin
-- **Credenciais Admin**:
-  - Username: admin
-  - Password: admin
-
-### Eureka Server
-- **URL**: http://localhost:8761
-
-### API Gateway
-- **URL**: http://localhost:8082
-
-### Serviços
-- **Auth Service**: http://localhost:8083
-- **Pagamentos Service**: http://localhost:8084
-- **Pedidos Service**: http://localhost:8085
-
-## Autenticação
-
-Para obter um token de acesso:
-
 ```bash
-curl -X POST http://localhost:8080/realms/leonardosr/protocol/openid-connect/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "client_id=auth-service" \
-  -d "client_secret=your-client-secret" \
-  -d "grant_type=password" \
-  -d "username=admin@leonardosr.com.br" \
-  -d "password=admin123"
+docker-compose up -d
 ```
 
-Use o token recebido no header Authorization das requisições:
+3. O Keycloak estará disponível em:
+   - URL: http://localhost:8080
+   - Usuário padrão: admin
+   - Senha padrão: admin
 
+## 🔌 Portas e Endpoints
+
+- **Gateway**: 8082
+  - `/auth-service/**` - Serviço de Autenticação
+  - `/pagamentos-ms/**` - Serviço de Pagamentos
+  - `/pedidos/**` - Serviço de Pedidos
+
+- **Keycloak**: 8080
+- **Demais serviços**: Portas dinâmicas (registradas no Eureka)
+
+## 🔒 Autenticação
+
+O sistema utiliza Keycloak para autenticação e autorização:
+
+1. Obter token:
 ```bash
-curl -H "Authorization: Bearer {seu-token}" http://localhost:8082/api/...
+POST http://localhost:8082/auth-service/auth/token
+{
+    "username": "admin",
+    "password": "admin"
+}
 ```
 
-## Usuários Padrão
+2. Usar o token nas requisições:
+```bash
+Authorization: Bearer {seu-token}
+```
 
-### Admin
-- **Email**: admin@leonardosr.com.br
-- **Senha**: admin123
-- **Role**: ADMIN
+## 💳 Endpoints de Pagamentos
 
-## Desenvolvimento
+### Criar Pagamento
+```bash
+POST http://localhost:8082/pagamentos-ms/pagamentos
+{
+    "valor": 100.00,
+    "pedidoId": 1,
+    "status": "PENDENTE"
+}
+```
 
-Para adicionar um novo serviço:
+### Listar Pagamentos
+```bash
+GET http://localhost:8082/pagamentos-ms/pagamentos
+```
 
-1. Crie um novo diretório para o serviço
-2. Copie o template do Dockerfile
-3. Adicione o serviço no docker-compose.yml
-4. Configure a segurança usando o Keycloak
-5. Registre o serviço no Eureka
+### Atualizar Status
+```bash
+PATCH http://localhost:8082/pagamentos-ms/pagamentos/{id}/status
+{
+    "status": "CONFIRMADO"
+}
+```
 
-## Troubleshooting
+## 🏃‍♂️ Execução Local
 
-### Serviços não iniciam
-1. Verifique os logs: `docker-compose logs -f [serviço]`
-2. Verifique se o MySQL está acessível
-3. Verifique se o Keycloak está configurado corretamente
+1. Inicie o Docker Compose:
+```bash
+docker-compose up -d
+```
 
-### Problemas de autenticação
-1. Verifique se o token está válido
-2. Verifique as configurações do cliente no Keycloak
-3. Verifique os logs do serviço de autenticação 
+2. Execute os serviços na ordem:
+   - Discovery
+   - Gateway
+   - Auth Service
+   - Pagamentos
+   - Pedidos
+
+## 👥 Contribuição
+
+1. Faça o fork do projeto
+2. Crie sua feature branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adicionando nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes. 
